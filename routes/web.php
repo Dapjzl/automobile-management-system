@@ -47,7 +47,7 @@ Route::get('/Inventory', Inventory::class )->name('Inventory');
 Route::get('/InventorySingle/{code}', InventorySingle::class )->name('InventorySingle');
 Route::get('/becomeSeller', BecomeSeller::class )->name('becomeSeller');
 Route::get('/contact', Contact::class )->name('contact');
-Route::get('/test-Drive', TestDrive::class )->name('test-Drive');
+// Route::get('/test-Drive', TestDrive::class )->name('test-Drive');
 
 
 
