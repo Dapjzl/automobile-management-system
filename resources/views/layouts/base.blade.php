@@ -55,12 +55,6 @@
     });
 })
 </script>
-<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-<!--[if lt IE 9]>
-        <script src="'https://ss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js'"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-<![endif]-->
 @livewireStyles()
 </head>
 
@@ -86,18 +80,18 @@
         	<p>Mon to Fri : 9:00am to 6:00pm</p>
         </div>
         <ul class="nav navbar-nav">
-          <li><a href="{{ route('Inventory') }}">Buy A Car</a></li> 
+          <li><a href="{{ route('Inventory') }}">Buy Car</a></li> 
           @if (Route::has('login'))
             @auth
               @if(Auth::user()->utype == 'ADM')
-              <li><a href="{{ route('admin.dashboard') }}">Sell A Car</a></li>
+              <li><a href="{{ route('admin.dashboard') }}">Sell Car</a></li>
               @elseif (Auth::user()->utype == 'SEL')
-              <li><a href="{{ route('seller.dashboard') }}">Sell A Car</a></li>
+              <li><a href="{{ route('seller.dashboard') }}">Sell Car</a></li>
               @elseif (Auth::user()->utype == 'CUS')
-              <li><a href="{{ route('becomeSeller') }}">Sell A Car</a></li>
+              <li><a href="{{ route('becomeSeller') }}">Sell Car</a></li>
             @endauth
           @else
-              <li><a href="{{ route('becomeSeller') }}">Sell A Car</a></li>
+              <li><a href="{{ route('becomeSeller') }}">Sell Car</a></li>
               @endif
           @endif
           <li><a href="{{ route('aboutus') }}">About Us</a></li>
@@ -118,7 +112,7 @@
             </ul>
           </li>
           @else
-          <li class="dropdown"><a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">LOGIN/REGISTER</a>
+          <li class="dropdown"><a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">SIGN UP</a>
             <ul class="dropdown-menu">
               <li><a href="/login">Login</a></li>
               <li><a href="/register">Register</a></li>
@@ -179,13 +173,6 @@
     <div class="container">
       <div class="row">
         <div class="col-md-6 col-md-push-6 text-right">
-          {{-- <div class="footer_widget">
-            <p>Download Our APP:</p>
-            <ul>
-              <li><a href="#"><i class="fa fa-android" aria-hidden="true"></i></a></li>
-              <li><a href="#"><i class="fa fa-apple" aria-hidden="true"></i></a></li>
-            </ul>
-          </div> --}}
           <div class="footer_widget">
             <p>Connect with Us:</p>
             <ul>
@@ -198,7 +185,7 @@
           </div>
         </div>
         <div class="col-md-6 col-md-pull-6">
-          <p class="copy-right">Copyright &copy; 2022 Hybridsoft LTD. All Rights Reserved</p>
+          <p class="copy-right">Copyright &copy; {{date('Y')}} &nbsp; <a href="https://onaolapoadedapo-portfolio.vercel.app/" target="_blank">Onaolapo Adedapo</a>.&nbsp; All Rights Reserved</p>
         </div>
       </div>
     </div>
