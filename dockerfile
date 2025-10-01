@@ -56,3 +56,5 @@ EXPOSE 9000
 
 # Start PHP-FPM
 CMD ["php-fpm"]
+
+# To build and run the Docker container, use the following commands:
