@@ -19,20 +19,24 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 # Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
-# Install Node.js dependencies
-RUN npm install && npm run dev
-
-# Install Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-
 # Set working directory
 WORKDIR /var/www
 
-# Copy existing application directory contents
+# Copy composer and npm files first (better caching)
+COPY composer.json composer.lock package*.json ./
+
+# Install PHP dependencies
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+RUN composer install --no-dev --optimize-autoloader
+
+# Install Node.js dependencies
+RUN npm install
+
+# Copy the rest of the application
 COPY . .
 
-# Install application dependencies
-RUN composer install --no-dev --optimize-autoloader
+# Build frontend assets (⚠️ use build instead of dev)
+RUN npm run build
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
