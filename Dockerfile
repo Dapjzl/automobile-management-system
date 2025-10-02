@@ -1,61 +1,61 @@
-FROM php:8.2-fpm
+# Stage 1 - Build Frontend (Vite)
+FROM node:18 AS frontend
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+# Stage 2 - Backend (Laravel + PHP + Composer)
+FROM php:8.2-fpm AS backend
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    git \
-    curl \
+    git curl unzip zip \
     libpng-dev \
+    libjpeg-dev \
+    libwebp-dev \
+    libfreetype6-dev \
     libonig-dev \
-    libxml2-dev \
-    zip \
-    unzip \
-    nodejs \
-    npm \
-    libzip-dev
+    libzip-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+# Configure & install PHP extensions
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install -j$(nproc) pdo_mysql mbstring zip gd bcmath exif pcntl
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+# Copy composer from official image
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Set working directory
 WORKDIR /var/www
 
-# Copy composer and npm files first (better caching)
-COPY composer.json composer.lock package*.json ./
+# Copy composer files first to leverage Docker cache
+COPY composer.json composer.lock ./
 
-# Install PHP dependencies
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-RUN composer install --no-dev --optimize-autoloader
+# Install PHP dependencies (Livewire should be listed in composer.json)
+RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
 
-# Install Node.js dependencies
-RUN npm install
-
-# Copy the rest of the application
+# Copy app files
 COPY . .
 
-# Build frontend assets (⚠️ use build instead of dev)
-RUN npm run build
+# Set file permissions for Laravel
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
+    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+# Publish Livewire assets (safe if Livewire is installed)
+RUN php artisan livewire:publish --assets || true
 
-# Generate application key and optimize
-RUN php artisan key:generate && \
-    php artisan config:cache && \
-    php artisan route:cache && \
-    php artisan view:cache && \
-    php artisan storage:link
+# Create storage symlink if not present (ignore if already linked)
+RUN php artisan storage:link || true
 
-# Set up Livewire assets
-RUN php artisan livewire:publish --assets
+# Clear and cache config/routes/views for better performance
+RUN php artisan config:clear \
+    && php artisan route:clear \
+    && php artisan view:clear \
+    && php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache
 
-# Expose port 9000
 EXPOSE 9000
 
-# Start PHP-FPM
 CMD ["php-fpm"]
-
-# To build and run the Docker container, use the following commands:
-# docker build -t automobile-management-system .
