@@ -33,6 +33,9 @@ RUN php artisan config:clear && \
     php artisan route:clear && \
     php artisan view:clear
 
+# Remove default Nginx config
+RUN rm -f /etc/nginx/conf.d/default.conf
+
 # Copy Nginx config
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 
