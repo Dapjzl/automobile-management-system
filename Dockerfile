@@ -29,6 +29,9 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
        gd \
        zip
 
+# Install PostgreSQL extension
+RUN docker-php-ext-install pdo_pgsql
+
 # Install Composer from official image
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
@@ -63,5 +66,6 @@ RUN chown -R www-data:www-data /var/www \
 EXPOSE 8000
 
 # Start Laravel with PHP's built-in server
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=${PORT}"]
+
 
